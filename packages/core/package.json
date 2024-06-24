@@ -23,7 +23,7 @@
     "test": "node ./__tests__/core.test.js"
   },
   "dependencies": {
-    "@wf-cli-dev/utils": "^1.0.4"
+    "@wf-cli-dev/utils": "^1.0.0"
   },
   "publishConfig": {
     "access": "public"
