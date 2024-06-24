@@ -1,0 +1,26 @@
+{
+  "name": "@wf-cli-dev/utils",
+  "version": "1.0.0",
+  "description": "@wf-cli-dev utils",
+  "keywords": [
+    "wf-cli-dev"
+  ],
+  "author": "nextc <1391040917@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/utils.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "node ./__tests__/utils.test.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "34e516703610f4450d5d918976fe5404f1d73787"
+}

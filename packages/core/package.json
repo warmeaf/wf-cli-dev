@@ -1,0 +1,32 @@
+{
+  "name": "@wf-cli-dev/core",
+  "version": "1.0.0",
+  "description": "@wf-cli-dev core",
+  "keywords": [
+    "wf-cli-dev"
+  ],
+  "bin": {
+    "wf-cli-dev": "bin/index.js"
+  },
+  "author": "nextc <1391040917@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "node ./__tests__/core.test.js"
+  },
+  "dependencies": {
+    "@wf-cli-dev/utils": "^1.0.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "34e516703610f4450d5d918976fe5404f1d73787"
+}
