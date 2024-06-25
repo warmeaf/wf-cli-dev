@@ -1,12 +1,18 @@
 {
   "name": "wf-cli-dev",
   "version": "1.0.0",
-  "main": "index.js",  
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "wf-cli-dev": "core/cli/bin/index.js"
+  },
   "workspaces": [
-    "packages/*"
+    "core/*",
+    "commands/*",
+    "models/*",
+    "utils/*"
   ],
   "keywords": [],
   "author": "",
