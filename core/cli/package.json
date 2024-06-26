@@ -28,6 +28,8 @@
   "gitHead": "34e516703610f4450d5d918976fe5404f1d73787",
   "dependencies": {
     "@wf-cli-dev/log": "file:../../utils/log",
-    "import-local": "^3.1.0"
+    "colors": "^1.4.0",
+    "import-local": "^3.1.0",
+    "semver": "^7.6.2"
   }
 }
