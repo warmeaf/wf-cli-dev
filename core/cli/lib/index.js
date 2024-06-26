@@ -15,6 +15,7 @@ function core() {
   try {
     checkPkgVersion()
     checkNodeVersion()
+    checkRoot()
   } catch (e) {
     log.error(e.message)
   }
@@ -38,4 +39,12 @@ function checkNodeVersion() {
       )
     )
   }
+}
+
+// 检查Root账户
+// 如果使用root账户执行，那么创建的文件就是root账户的
+// 因此需要提醒用户，不要使用root账户执行
+function checkRoot() {
+  const rootCheck = require('root-check')
+  rootCheck()
 }
