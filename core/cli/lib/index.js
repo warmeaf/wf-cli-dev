@@ -4,6 +4,8 @@ module.exports = core
 
 const semver = require('semver')
 const colors = require('colors/safe')
+const homedir = require('os').homedir()
+const existsSync = require('fs').existsSync
 // require: .js/.json/.node
 // any -> .js
 const pkg = require('../package.json')
@@ -16,6 +18,7 @@ function core() {
     checkPkgVersion()
     checkNodeVersion()
     checkRoot()
+    checkUserHome()
   } catch (e) {
     log.error(e.message)
   }
@@ -47,4 +50,12 @@ function checkNodeVersion() {
 function checkRoot() {
   const rootCheck = require('root-check')
   rootCheck()
+}
+
+// 检查用户主目录
+// 没有用户主目录，后续有些事情做不了，比如缓存
+function checkUserHome() {
+  if (!homedir || !existsSync(homedir)) {
+    throw new Error(colors.red('当前用户主目录不存在'))
+  }
 }
