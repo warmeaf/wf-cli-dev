@@ -43,7 +43,7 @@ function checkNodeVersion() {
 
 // 检查Root账户
 // 如果使用root账户执行，那么创建的文件就是root账户的
-// 因此需要提醒用户，不要使用root账户执行
+// 因此需要检查root账户，并自动降级
 function checkRoot() {
   const rootCheck = require('root-check')
   rootCheck()
