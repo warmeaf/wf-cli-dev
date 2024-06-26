@@ -6,6 +6,7 @@ const semver = require('semver')
 const colors = require('colors/safe')
 const homedir = require('os').homedir()
 const existsSync = require('fs').existsSync
+let argv = require('minimist')(process.argv.slice(2))
 // require: .js/.json/.node
 // any -> .js
 const pkg = require('../package.json')
@@ -19,6 +20,7 @@ function core() {
     checkNodeVersion()
     checkRoot()
     checkUserHome()
+    checkInputArgs()
   } catch (e) {
     log.error(e.message)
   }
@@ -58,4 +60,16 @@ function checkUserHome() {
   if (!homedir || !existsSync(homedir)) {
     throw new Error(colors.red('当前用户主目录不存在'))
   }
+}
+
+// 检查入参
+// 控制开启debug模式
+function checkInputArgs() {
+  if (argv.debug) {
+    process.env.LOG_LEVEL = 'verbose'
+  } else {
+    process.env.LOG_LEVEL = 'info'
+  }
+  log.level = process.env.LOG_LEVEL
+  log.verbose('debug', argv)
 }
