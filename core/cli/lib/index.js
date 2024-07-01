@@ -13,7 +13,7 @@ const pkg = require('../package.json')
 const log = require('@wf-cli-dev/log')
 const constant = require('./const')
 
-function core() {
+async function core() {
   // try catch 包裹，不显示不必要的报错堆栈信息
   try {
     checkPkgVersion()
@@ -21,6 +21,7 @@ function core() {
     checkRoot()
     checkUserHome()
     checkInputArgs()
+    await checkGlobalUpdate()
   } catch (e) {
     log.error(e.message)
   }
@@ -72,4 +73,23 @@ function checkInputArgs() {
   }
   log.level = process.env.LOG_LEVEL
   log.verbose('debug', argv)
+}
+
+// 检查更新
+async function checkGlobalUpdate() {
+  // 获取当前版本号和模块名
+  const currentVersion = pkg.version
+  const npmName = pkg.name
+  // 调用 npm api 获取所有版本号
+  // 比对当前版本号和所有版本号，找出所有大于当前版本的版本号
+  // 找出最新的版本号，提示用户更新该版本
+  const { getSemverVersions } = require('@wf-cli-dev/get-npm-info')
+  const recentVersion = await getSemverVersions(currentVersion, npmName)
+  if (recentVersion && semver.gt(recentVersion, currentVersion)) {
+    log.warn(
+      colors.yellow(
+        `请手动更新 ${npmName}, 当前版本 ${currentVersion}, 最新版本 ${recentVersion}，更新的命令 npm i -g ${npmName}`
+      )
+    )
+  }
 }

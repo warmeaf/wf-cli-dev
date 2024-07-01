@@ -28,6 +28,7 @@
   "gitHead": "34e516703610f4450d5d918976fe5404f1d73787",
   "dependencies": {
     "@wf-cli-dev/log": "file:../../utils/log",
+    "@wf-cli-dev/get-npm-info": "file:../../utils/get-npm-info",
     "colors": "^1.4.0",
     "import-local": "^3.1.0",
     "minimist": "^1.2.8",
