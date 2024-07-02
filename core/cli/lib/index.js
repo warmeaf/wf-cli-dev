@@ -5,23 +5,27 @@ module.exports = core
 const semver = require('semver')
 const colors = require('colors/safe')
 const homedir = require('os').homedir()
+const commander = require('commander')
 const existsSync = require('fs').existsSync
 let argv = require('minimist')(process.argv.slice(2))
 // require: .js/.json/.node
 // any -> .js
 const pkg = require('../package.json')
 const log = require('@wf-cli-dev/log')
+const init = require('@wf-cli-dev/init')
 const constant = require('./const')
+const program = new commander.Command()
 
 async function core() {
   // try catch 包裹，不显示不必要的报错堆栈信息
   try {
-    checkPkgVersion()
+    // checkPkgVersion()
     checkNodeVersion()
     checkRoot()
     checkUserHome()
-    checkInputArgs()
+    // checkInputArgs()
     await checkGlobalUpdate()
+    registerCommand()
   } catch (e) {
     log.error(e.message)
   }
@@ -92,4 +96,44 @@ async function checkGlobalUpdate() {
       )
     )
   }
+}
+
+// 注册命令
+function registerCommand() {
+  program
+    .name(Object.keys(pkg.bin)[0])
+    .usage('<command> [options]')
+    .version(pkg.version)
+    .option('-d, --debug', '是否开启调试模式', false)
+
+  // 注册 init 命令
+  program
+    .command('init [projectName]')
+    .description('初始化项目')
+    .option('-f, --force', '是否强制初始化项目')
+    .action(init)
+
+  const options = program.opts()
+  // 监听 debug option
+  program.on('option:debug', () => {
+    if (options.debug) {
+      process.env.LOG_LEVEL = 'verbose'
+    } else {
+      process.env.LOG_LEVEL = 'info'
+    }
+    log.level = process.env.LOG_LEVEL
+  })
+
+  // 监听未知命令
+  program.on('command:*', (obj) => {
+    const availableCommands = program.commands.map((cmd) => cmd.name())
+    log.error(
+      colors.red(`未知的命令 ${obj[0]}，请使用 -h, --help 参数查看命令列表`)
+    )
+    if (availableCommands.length > 0) {
+      log.info(colors.blue(`可用的命令有 ${availableCommands.join(',')}`))
+    }
+  })
+
+  program.parse(process.argv)
 }

@@ -8,6 +8,8 @@ var colors = require('colors/safe');
 
 var homedir = require('os').homedir();
 
+var commander = require('commander');
+
 var existsSync = require('fs').existsSync;
 
 var argv = require('minimist')(process.argv.slice(2)); // require: .js/.json/.node
@@ -18,7 +20,11 @@ var pkg = require('../package.json');
 
 var log = require('@wf-cli-dev/log');
 
+var init = require('@wf-cli-dev/init');
+
 var constant = require('./const');
+
+var program = new commander.Command();
 
 function core() {
   return regeneratorRuntime.async(function core$(_context) {
@@ -26,29 +32,30 @@ function core() {
       switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
-          checkPkgVersion();
+          // checkPkgVersion()
           checkNodeVersion();
           checkRoot();
-          checkUserHome();
-          checkInputArgs();
-          _context.next = 8;
+          checkUserHome(); // checkInputArgs()
+
+          _context.next = 6;
           return regeneratorRuntime.awrap(checkGlobalUpdate());
 
-        case 8:
-          _context.next = 13;
+        case 6:
+          registerCommand();
+          _context.next = 12;
           break;
 
-        case 10:
-          _context.prev = 10;
+        case 9:
+          _context.prev = 9;
           _context.t0 = _context["catch"](0);
           log.error(_context.t0.message);
 
-        case 13:
+        case 12:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 10]]);
+  }, null, null, [[0, 9]]);
 } // 检查包版本号
 
 
@@ -129,4 +136,34 @@ function checkGlobalUpdate() {
       }
     }
   });
+} // 注册命令
+
+
+function registerCommand() {
+  program.name(Object.keys(pkg.bin)[0]).usage('<command> [options]').version(pkg.version).option('-d, --debug', '是否开启调试模式', false); // 注册 init 命令
+
+  program.command('init [projectName]').description('初始化项目').option('-f, --force', '是否强制初始化项目').action(init);
+  var options = program.opts(); // 监听 debug option
+
+  program.on('option:debug', function () {
+    if (options.debug) {
+      process.env.LOG_LEVEL = 'verbose';
+    } else {
+      process.env.LOG_LEVEL = 'info';
+    }
+
+    log.level = process.env.LOG_LEVEL;
+  }); // 监听未知命令
+
+  program.on('command:*', function (obj) {
+    var availableCommands = program.commands.map(function (cmd) {
+      return cmd.name();
+    });
+    log.error(colors.red("\u672A\u77E5\u7684\u547D\u4EE4 ".concat(obj[0], "\uFF0C\u8BF7\u4F7F\u7528 -h, --help \u53C2\u6570\u67E5\u770B\u547D\u4EE4\u5217\u8868")));
+
+    if (availableCommands.length > 0) {
+      log.info(colors.blue("\u53EF\u7528\u7684\u547D\u4EE4\u6709 ".concat(availableCommands.join(','))));
+    }
+  });
+  program.parse(process.argv);
 }
