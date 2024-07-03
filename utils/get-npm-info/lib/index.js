@@ -29,6 +29,12 @@ function getDefaultRegistry(isOrignal = true) {
     : 'https://registry.npm.taobao.org'
 }
 
+/**
+ * 获取指定 npm 包的所有版本信息
+ * @param {string} npmName - 要获取版本信息的 npm 包的名称
+ * @param {string} registry - 使用的 npm registry 地址
+ * @returns {Promise<string[]>} 包含版本号的字符串数组，如果获取失败或没有版本信息，则返回空数组
+ */
 async function getNpmVersions(npmName, registry) {
   const data = await getNpmInfo(npmName, registry)
   if (data?.versions) {
@@ -59,6 +65,7 @@ async function getSemverVersions(baseVersion, npmName, registry) {
 
 module.exports = {
   getNpmInfo,
+  getDefaultRegistry,
   getNpmVersions,
   getSemverVersions,
 }

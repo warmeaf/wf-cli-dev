@@ -12,6 +12,7 @@ const path = require('path')
 const pkg = require('../package.json')
 const log = require('@wf-cli-dev/log')
 const init = require('@wf-cli-dev/init')
+const exec = require('@wf-cli-dev/exec')
 const constant = require('./const')
 const program = new commander.Command()
 
@@ -131,7 +132,7 @@ function registerCommand() {
     .command('init [projectName]')
     .description('初始化项目')
     .option('-f, --force', '是否强制初始化项目')
-    .action(init)
+    .action(exec)
 
   const options = program.opts()
   // 监听 targetPath option

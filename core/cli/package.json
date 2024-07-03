@@ -30,6 +30,7 @@
     "@wf-cli-dev/get-npm-info": "file:../../utils/get-npm-info",
     "@wf-cli-dev/init": "file:../../commands/init",
     "@wf-cli-dev/log": "file:../../utils/log",
+    "@wf-cli-dev/exec": "file:../../core/exec",
     "colors": "^1.4.0",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",

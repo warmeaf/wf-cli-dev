@@ -22,6 +22,8 @@ var log = require('@wf-cli-dev/log');
 
 var init = require('@wf-cli-dev/init');
 
+var exec = require('@wf-cli-dev/exec');
+
 var constant = require('./const');
 
 var program = new commander.Command();
@@ -176,7 +178,7 @@ function registerCommand() {
   // 脚手架初始化
   program.name(Object.keys(pkg.bin)[0]).usage('<command> [options]').version(pkg.version).option('-d, --debug', '是否开启调试模式', false).option('-tp, --targetPath <targetPath>', '是否指定本地调试文件夹', ''); // 注册 init 命令
 
-  program.command('init [projectName]').description('初始化项目').option('-f, --force', '是否强制初始化项目').action(init);
+  program.command('init [projectName]').description('初始化项目').option('-f, --force', '是否强制初始化项目').action(exec);
   var options = program.opts(); // 监听 targetPath option
 
   program.on('option:targetPath', function () {
