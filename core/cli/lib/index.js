@@ -6,10 +6,9 @@ const semver = require('semver')
 const colors = require('colors/safe')
 const homedir = require('os').homedir()
 const commander = require('commander')
+const dotenv = require('dotenv')
 const existsSync = require('fs').existsSync
-let argv = require('minimist')(process.argv.slice(2))
-// require: .js/.json/.node
-// any -> .js
+const path = require('path')
 const pkg = require('../package.json')
 const log = require('@wf-cli-dev/log')
 const init = require('@wf-cli-dev/init')
@@ -19,16 +18,20 @@ const program = new commander.Command()
 async function core() {
   // try catch 包裹，不显示不必要的报错堆栈信息
   try {
-    // checkPkgVersion()
-    checkNodeVersion()
-    checkRoot()
-    checkUserHome()
-    // checkInputArgs()
-    await checkGlobalUpdate()
+    await prepare()
     registerCommand()
   } catch (e) {
     log.error(e.message)
   }
+}
+
+// 脚手架准备阶段
+async function prepare() {
+  checkPkgVersion()
+  checkRoot()
+  checkUserHome()
+  checkEnv()
+  await checkGlobalUpdate()
 }
 
 // 检查包版本号
@@ -67,16 +70,31 @@ function checkUserHome() {
   }
 }
 
-// 检查入参
-// 控制开启debug模式
-function checkInputArgs() {
-  if (argv.debug) {
-    process.env.LOG_LEVEL = 'verbose'
-  } else {
-    process.env.LOG_LEVEL = 'info'
+// 检查环境变量
+function checkEnv() {
+  const dotenvPath = path.resolve(homedir, '.env')
+  if (existsSync(dotenvPath)) {
+    // 用于加载 .env 文件中的环境变量到 Node.js 的 process.env 对象中
+    dotenv.config({
+      path: dotenvPath,
+    })
   }
-  log.level = process.env.LOG_LEVEL
-  log.verbose('debug', argv)
+
+  createDefaultConfig()
+}
+
+// 创建默认的环境变量配置
+function createDefaultConfig() {
+  const cliConfig = {
+    home: homedir,
+    cliHome: '',
+  }
+  if (process.env.CLI_HOME) {
+    cliConfig.cliHome = path.join(cliConfig.home, process.env.CLI_HOME)
+  } else {
+    cliConfig.cliHome = path.join(cliConfig.home, constant.DEFAULT_CLI_HOME)
+  }
+  process.env.CLI_HOME_PATH = cliConfig.cliHome
 }
 
 // 检查更新
@@ -100,11 +118,13 @@ async function checkGlobalUpdate() {
 
 // 注册命令
 function registerCommand() {
+  // 脚手架初始化
   program
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
     .version(pkg.version)
     .option('-d, --debug', '是否开启调试模式', false)
+    .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件夹', '')
 
   // 注册 init 命令
   program
@@ -114,6 +134,11 @@ function registerCommand() {
     .action(init)
 
   const options = program.opts()
+  // 监听 targetPath option
+  program.on('option:targetPath', () => {
+    // 为 targetPath 设置全局环境变量（这是一个开发技巧）
+    process.env.CLI_TARGET_PATH = options.targetPath
+  })
   // 监听 debug option
   program.on('option:debug', () => {
     if (options.debug) {

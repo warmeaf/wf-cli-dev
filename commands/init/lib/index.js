@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
-module.exports = init;
+module.exports = init
 
 function init(projectName, options) {
-  console.log('init', projectName, options)
+  console.log('init', projectName, options, process.env.CLI_TARGET_PATH)
 }

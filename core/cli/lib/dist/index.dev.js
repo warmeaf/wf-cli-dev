@@ -10,11 +10,11 @@ var homedir = require('os').homedir();
 
 var commander = require('commander');
 
+var dotenv = require('dotenv');
+
 var existsSync = require('fs').existsSync;
 
-var argv = require('minimist')(process.argv.slice(2)); // require: .js/.json/.node
-// any -> .js
-
+var path = require('path');
 
 var pkg = require('../package.json');
 
@@ -32,30 +32,46 @@ function core() {
       switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
-          // checkPkgVersion()
-          checkNodeVersion();
-          checkRoot();
-          checkUserHome(); // checkInputArgs()
+          _context.next = 3;
+          return regeneratorRuntime.awrap(prepare());
 
-          _context.next = 6;
-          return regeneratorRuntime.awrap(checkGlobalUpdate());
-
-        case 6:
+        case 3:
           registerCommand();
-          _context.next = 12;
+          _context.next = 9;
           break;
 
-        case 9:
-          _context.prev = 9;
+        case 6:
+          _context.prev = 6;
           _context.t0 = _context["catch"](0);
           log.error(_context.t0.message);
 
-        case 12:
+        case 9:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 9]]);
+  }, null, null, [[0, 6]]);
+} // 脚手架准备阶段
+
+
+function prepare() {
+  return regeneratorRuntime.async(function prepare$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          checkPkgVersion();
+          checkRoot();
+          checkUserHome();
+          checkEnv();
+          _context2.next = 6;
+          return regeneratorRuntime.awrap(checkGlobalUpdate());
+
+        case 6:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  });
 } // 检查包版本号
 
 
@@ -90,28 +106,45 @@ function checkUserHome() {
   if (!homedir || !existsSync(homedir)) {
     throw new Error(colors.red('当前用户主目录不存在'));
   }
-} // 检查入参
-// 控制开启debug模式
+} // 检查环境变量
 
 
-function checkInputArgs() {
-  if (argv.debug) {
-    process.env.LOG_LEVEL = 'verbose';
-  } else {
-    process.env.LOG_LEVEL = 'info';
+function checkEnv() {
+  var dotenvPath = path.resolve(homedir, '.env');
+
+  if (existsSync(dotenvPath)) {
+    // 用于加载 .env 文件中的环境变量到 Node.js 的 process.env 对象中
+    dotenv.config({
+      path: dotenvPath
+    });
   }
 
-  log.level = process.env.LOG_LEVEL;
-  log.verbose('debug', argv);
+  createDefaultConfig();
+} // 创建默认的环境变量配置
+
+
+function createDefaultConfig() {
+  var cliConfig = {
+    home: homedir,
+    cliHome: ''
+  };
+
+  if (process.env.CLI_HOME) {
+    cliConfig.cliHome = path.join(cliConfig.home, process.env.CLI_HOME);
+  } else {
+    cliConfig.cliHome = path.join(cliConfig.home, constant.DEFAULT_CLI_HOME);
+  }
+
+  process.env.CLI_HOME_PATH = cliConfig.cliHome;
 } // 检查更新
 
 
 function checkGlobalUpdate() {
   var currentVersion, npmName, _require, getSemverVersions, recentVersion;
 
-  return regeneratorRuntime.async(function checkGlobalUpdate$(_context2) {
+  return regeneratorRuntime.async(function checkGlobalUpdate$(_context3) {
     while (1) {
-      switch (_context2.prev = _context2.next) {
+      switch (_context3.prev = _context3.next) {
         case 0:
           // 获取当前版本号和模块名
           currentVersion = pkg.version;
@@ -120,11 +153,11 @@ function checkGlobalUpdate() {
           // 找出最新的版本号，提示用户更新该版本
 
           _require = require('@wf-cli-dev/get-npm-info'), getSemverVersions = _require.getSemverVersions;
-          _context2.next = 5;
+          _context3.next = 5;
           return regeneratorRuntime.awrap(getSemverVersions(currentVersion, npmName));
 
         case 5:
-          recentVersion = _context2.sent;
+          recentVersion = _context3.sent;
 
           if (recentVersion && semver.gt(recentVersion, currentVersion)) {
             log.warn(colors.yellow("\u8BF7\u624B\u52A8\u66F4\u65B0 ".concat(npmName, ", \u5F53\u524D\u7248\u672C ").concat(currentVersion, ", \u6700\u65B0\u7248\u672C ").concat(recentVersion, "\uFF0C\u66F4\u65B0\u7684\u547D\u4EE4 npm i -g ").concat(npmName)));
@@ -132,7 +165,7 @@ function checkGlobalUpdate() {
 
         case 7:
         case "end":
-          return _context2.stop();
+          return _context3.stop();
       }
     }
   });
@@ -140,10 +173,16 @@ function checkGlobalUpdate() {
 
 
 function registerCommand() {
-  program.name(Object.keys(pkg.bin)[0]).usage('<command> [options]').version(pkg.version).option('-d, --debug', '是否开启调试模式', false); // 注册 init 命令
+  // 脚手架初始化
+  program.name(Object.keys(pkg.bin)[0]).usage('<command> [options]').version(pkg.version).option('-d, --debug', '是否开启调试模式', false).option('-tp, --targetPath <targetPath>', '是否指定本地调试文件夹', ''); // 注册 init 命令
 
   program.command('init [projectName]').description('初始化项目').option('-f, --force', '是否强制初始化项目').action(init);
-  var options = program.opts(); // 监听 debug option
+  var options = program.opts(); // 监听 targetPath option
+
+  program.on('option:targetPath', function () {
+    // 为 targetPath 设置全局环境变量（这是一个开发技巧）
+    process.env.CLI_TARGET_PATH = options.targetPath;
+  }); // 监听 debug option
 
   program.on('option:debug', function () {
     if (options.debug) {
