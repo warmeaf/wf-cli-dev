@@ -13,7 +13,8 @@ var Package = require('@wf-cli-dev/package');
 
 module.exports = exec;
 var SETTINGS = {
-  init: '@wf-cli-dev/init' // init: '@imooc-cli/init', // 用于调试
+  // init: '@wf-cli-dev/init',
+  init: '@imooc-cli/init' // 用于调试
 
 };
 var CATCH_DIR = 'dependencies';

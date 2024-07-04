@@ -15,8 +15,8 @@ const Package = require('@wf-cli-dev/package')
 module.exports = exec
 
 const SETTINGS = {
-  init: '@wf-cli-dev/init',
-  // init: '@imooc-cli/init', // 用于调试
+  // init: '@wf-cli-dev/init',
+  init: '@imooc-cli/init', // 用于调试
 }
 const CATCH_DIR = 'dependencies'
 

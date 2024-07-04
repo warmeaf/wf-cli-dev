@@ -55,6 +55,13 @@ class Package {
     }
   }
 
+  /**
+   * 获取缓存命令文件的完整文件路径
+   * 这个文件路径是根据 this.storeDir、this.catchFilePathPrefix、this.packageVersion 和 this.catchFilePathEnd 计算出来的
+   * 路径字符串的格式为：${this.storeDir}/_${this.catchFilePathPrefix}@${this.packageVersion}@${this.catchFilePathEnd}
+   *
+   * @returns {String} 获取缓存命令文件的完整文件路径
+   */
   get catchFilePath() {
     return path.resolve(
       this.storeDir,
@@ -69,7 +76,9 @@ class Package {
     if (endIndex === -1) {
       return this.packageName
     }
-    return this.packageName.slice(0, endIndex)
+    const start = this.packageName.slice(0, endIndex)
+    const end = this.packageName.slice(endIndex + 1)
+    return `${start}/${end}`
   }
 
   /**
@@ -161,23 +170,31 @@ class Package {
    * @returns {string|null} - 格式化后的文件路径，如果获取失败或没有相关属性，则返回 null
    */
   getRootFilePath() {
-    // 1. 获取目标路径 package.json 所在目录
-    const dir = pkgDir.sync(this.targetPath)
-    if (dir) {
-      // 2. 读取 package.json
-      const pkgFile = require(path.resolve(dir, 'package.json'))
+    function _getRootFile(targetPath) {
+      // 1. 获取目标路径 package.json 所在目录
+      const dir = pkgDir.sync(targetPath)
+      if (dir) {
+        // 2. 读取 package.json
+        const pkgFile = require(path.resolve(dir, 'package.json'))
 
-      // 3. 寻找 main/lib
-      // 4. formatPath 路径的兼容（mac/windows）
-      if (pkgFile && pkgFile.main) {
-        return formatPath(path.resolve(dir, pkgFile.main))
-      } else if (pkgFile && pkgFile.lib) {
-        return formatPath(path.resolve(dir, pkgFile.lib))
+        // 3. 寻找 main/lib
+        // 4. formatPath 路径的兼容（mac/windows）
+        if (pkgFile && pkgFile.main) {
+          return formatPath(path.resolve(dir, pkgFile.main))
+        } else if (pkgFile && pkgFile.lib) {
+          return formatPath(path.resolve(dir, pkgFile.lib))
+        } else {
+          return null
+        }
       } else {
         return null
       }
+    }
+
+    if (this.storeDir) {
+      return _getRootFile(this.catchFilePath)
     } else {
-      return null
+      return _getRootFile(this.targetPath)
     }
   }
 }
