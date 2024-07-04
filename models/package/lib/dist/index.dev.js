@@ -14,6 +14,8 @@ var pkgDir = require('pkg-dir');
 
 var npminstall = require('npminstall');
 
+var fse = require('fs-extra');
+
 var _require = require('@wf-cli-dev/utils'),
     isObject = _require.isObject,
     formatPath = _require.formatPath;
@@ -52,18 +54,22 @@ function () {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              if (this.storeDir && !existsSync(this.storeDir)) {
+                fse.mkdirpSync(this.storeDir);
+              }
+
               if (!(this.packageVersion === 'latest')) {
-                _context.next = 4;
+                _context.next = 5;
                 break;
               }
 
-              _context.next = 3;
+              _context.next = 4;
               return regeneratorRuntime.awrap(getNpmLatestVersion(this.packageName));
 
-            case 3:
+            case 4:
               this.packageVersion = _context.sent;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }

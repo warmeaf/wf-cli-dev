@@ -3,6 +3,7 @@ const path = require('path')
 const existsSync = require('fs').existsSync
 const pkgDir = require('pkg-dir')
 const npminstall = require('npminstall')
+const fse = require('fs-extra')
 const { isObject, formatPath } = require('@wf-cli-dev/utils')
 const {
   getDefaultRegistry,
@@ -28,6 +29,9 @@ class Package {
   }
 
   async prepare() {
+    if(this.storeDir && !existsSync(this.storeDir)) {
+      fse.mkdirpSync(this.storeDir)
+    }
     if (this.packageVersion === 'latest') {
       this.packageVersion = await getNpmLatestVersion(this.packageName)
     }

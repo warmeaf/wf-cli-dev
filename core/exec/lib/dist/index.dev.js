@@ -52,7 +52,7 @@ function exec() {
           storeDir = '', pkg = null;
 
           if (targetPath) {
-            _context.next = 25;
+            _context.next = 19;
             break;
           }
 
@@ -70,31 +70,17 @@ function exec() {
           return regeneratorRuntime.awrap(pkg.isExist());
 
         case 17:
-          if (!_context.sent) {
-            _context.next = 21;
-            break;
-          }
-
-          console.log('package is exist');
-          _context.next = 23;
+          _context.next = 20;
           break;
 
-        case 21:
-          _context.next = 23;
-          return regeneratorRuntime.awrap(pkg.install());
-
-        case 23:
-          _context.next = 26;
-          break;
-
-        case 25:
+        case 19:
           pkg = new Package({
             targetPath: targetPath,
             packageName: packageName,
             packageVersion: packageVersion
           });
 
-        case 26:
+        case 20:
           rootFile = pkg.getRootFilePath();
           log.verbose('rootFile', rootFile);
 
@@ -102,7 +88,7 @@ function exec() {
             require(rootFile).apply(void 0, args);
           }
 
-        case 29:
+        case 23:
         case "end":
           return _context.stop();
       }

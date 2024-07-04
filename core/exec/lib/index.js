@@ -44,11 +44,12 @@ async function exec(...args) {
       packageName,
       packageVersion,
     })
-    if (await pkg.isExist()) {
-      console.log('package is exist')
-    } else {
-      await pkg.install()
-    }
+    await pkg.isExist()
+    // if (await pkg.isExist()) {
+    //   console.log('package is exist')
+    // } else {
+    //   await pkg.install()
+    // }
   } else {
     pkg = new Package({
       targetPath,
