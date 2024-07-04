@@ -13,7 +13,9 @@ var Package = require('@wf-cli-dev/package');
 
 module.exports = exec;
 var SETTINGS = {
-  init: '@wf-cli-dev/init'
+  // init: '@wf-cli-dev/init',
+  init: '@imooc-cli/init' // 用于调试
+
 };
 var CATCH_DIR = 'dependencies';
 
@@ -50,7 +52,7 @@ function exec() {
           storeDir = '', pkg = null;
 
           if (targetPath) {
-            _context.next = 22;
+            _context.next = 25;
             break;
           }
 
@@ -64,31 +66,35 @@ function exec() {
             packageName: packageName,
             packageVersion: packageVersion
           });
+          _context.next = 17;
+          return regeneratorRuntime.awrap(pkg.isExist());
 
-          if (!pkg.isExist()) {
-            _context.next = 18;
+        case 17:
+          if (!_context.sent) {
+            _context.next = 21;
             break;
           }
 
-          _context.next = 20;
-          break;
-
-        case 18:
-          _context.next = 20;
-          return regeneratorRuntime.awrap(pkg.install());
-
-        case 20:
+          console.log('package is exist');
           _context.next = 23;
           break;
 
-        case 22:
+        case 21:
+          _context.next = 23;
+          return regeneratorRuntime.awrap(pkg.install());
+
+        case 23:
+          _context.next = 26;
+          break;
+
+        case 25:
           pkg = new Package({
             targetPath: targetPath,
             packageName: packageName,
             packageVersion: packageVersion
           });
 
-        case 23:
+        case 26:
           rootFile = pkg.getRootFilePath();
           log.verbose('rootFile', rootFile);
 
@@ -96,7 +102,7 @@ function exec() {
             require(rootFile).apply(void 0, args);
           }
 
-        case 26:
+        case 29:
         case "end":
           return _context.stop();
       }

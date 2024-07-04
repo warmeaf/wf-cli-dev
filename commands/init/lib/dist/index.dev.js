@@ -9,6 +9,5 @@ function init() {
 
   var projectName = args[0];
   var options = args[1];
-  var command = args.at(-1);
-  console.log(projectName, options, command);
+  var command = args.at(-1); // console.log(projectName, options, command)
 }

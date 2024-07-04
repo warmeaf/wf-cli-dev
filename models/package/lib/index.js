@@ -1,9 +1,13 @@
 'use strict'
 const path = require('path')
+const existsSync = require('fs').existsSync
 const pkgDir = require('pkg-dir')
 const npminstall = require('npminstall')
 const { isObject, formatPath } = require('@wf-cli-dev/utils')
-const { getDefaultRegistry } = require('@wf-cli-dev/get-npm-info')
+const {
+  getDefaultRegistry,
+  getNpmLatestVersion,
+} = require('@wf-cli-dev/get-npm-info')
 
 class Package {
   constructor(options) {
@@ -23,12 +27,55 @@ class Package {
     this.packageVersion = options.packageVersion
   }
 
-  // 判断当前 package 是否存在
-  isExist() {
-    console.log('package isExist')
+  async prepare() {
+    if (this.packageVersion === 'latest') {
+      this.packageVersion = await getNpmLatestVersion(this.packageName)
+    }
   }
-  // 安装包
-  install() {
+
+  get catchFilePath() {
+    return path.resolve(
+      this.storeDir,
+      `_${this.catchFilePathPrefix}@${this.packageVersion}@${this.catchFilePathEnd}`
+    )
+  }
+  get catchFilePathPrefix() {
+    return this.packageName.replace('/', '_')
+  }
+  get catchFilePathEnd() {
+    const endIndex = this.packageName.indexOf('/')
+    if (endIndex === -1) {
+      return this.packageName
+    }
+    return this.packageName.slice(0, endIndex)
+  }
+
+  /**
+   * 检查文件或目录是否存在
+   * 如果 storeDir 存在，等待 prepare() 函数执行完毕
+   * 然后检查 catchFilePath 是否存在
+   * 如果 storeDir 不存在，直接检查 targetPath 是否存在
+   * @returns {Promise<boolean>} 检查的结果是 true 或 false
+   */
+  async isExist() {
+    if (this.storeDir) {
+      await this.prepare()
+      return existsSync(this.catchFilePath)
+    } else {
+      return existsSync(this.targetPath)
+    }
+  }
+
+  /**
+   * 安装指定的 NPM 包
+   * 这个方法首先执行一个 prepare() 方法，可能是在安装前的一些准备工作
+   * 然后使用 npminstall 包来安装指定的 NPM 包
+   *
+   * @async
+   * @returns {Promise<void>} 一个 Promise，当初始化完成时解析
+   */
+  async install() {
+    await this.prepare()
     return npminstall({
       root: this.targetPath,
       storeDir: this.storeDir,

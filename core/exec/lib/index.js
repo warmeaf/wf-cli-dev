@@ -15,7 +15,8 @@ const Package = require('@wf-cli-dev/package')
 module.exports = exec
 
 const SETTINGS = {
-  init: '@wf-cli-dev/init',
+  // init: '@wf-cli-dev/init',
+  init: '@imooc-cli/init', // 用于调试
 }
 const CATCH_DIR = 'dependencies'
 
@@ -43,7 +44,8 @@ async function exec(...args) {
       packageName,
       packageVersion,
     })
-    if (pkg.isExist()) {
+    if (await pkg.isExist()) {
+      console.log('package is exist')
     } else {
       await pkg.install()
     }

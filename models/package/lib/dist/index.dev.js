@@ -8,6 +8,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var path = require('path');
 
+var existsSync = require('fs').existsSync;
+
 var pkgDir = require('pkg-dir');
 
 var npminstall = require('npminstall');
@@ -17,7 +19,8 @@ var _require = require('@wf-cli-dev/utils'),
     formatPath = _require.formatPath;
 
 var _require2 = require('@wf-cli-dev/get-npm-info'),
-    getDefaultRegistry = _require2.getDefaultRegistry;
+    getDefaultRegistry = _require2.getDefaultRegistry,
+    getNpmLatestVersion = _require2.getNpmLatestVersion;
 
 var Package =
 /*#__PURE__*/
@@ -40,27 +43,105 @@ function () {
 
     this.packageName = options.packageName;
     this.packageVersion = options.packageVersion;
-  } // 判断当前 package 是否存在
-
+  }
 
   _createClass(Package, [{
+    key: "prepare",
+    value: function prepare() {
+      return regeneratorRuntime.async(function prepare$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (!(this.packageVersion === 'latest')) {
+                _context.next = 4;
+                break;
+              }
+
+              _context.next = 3;
+              return regeneratorRuntime.awrap(getNpmLatestVersion(this.packageName));
+
+            case 3:
+              this.packageVersion = _context.sent;
+
+            case 4:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
     key: "isExist",
+
+    /**
+     * 检查文件或目录是否存在
+     * 如果 storeDir 存在，等待 prepare() 函数执行完毕
+     * 然后检查 catchFilePath 是否存在
+     * 如果 storeDir 不存在，直接检查 targetPath 是否存在
+     * @returns {Promise<boolean>} 检查的结果是 true 或 false
+     */
     value: function isExist() {
-      console.log('package isExist');
-    } // 安装包
+      return regeneratorRuntime.async(function isExist$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!this.storeDir) {
+                _context2.next = 6;
+                break;
+              }
+
+              _context2.next = 3;
+              return regeneratorRuntime.awrap(this.prepare());
+
+            case 3:
+              return _context2.abrupt("return", existsSync(this.catchFilePath));
+
+            case 6:
+              return _context2.abrupt("return", existsSync(this.targetPath));
+
+            case 7:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+    /**
+     * 安装指定的 NPM 包
+     * 这个方法首先执行一个 prepare() 方法，可能是在安装前的一些准备工作
+     * 然后使用 npminstall 包来安装指定的 NPM 包
+     *
+     * @async
+     * @returns {Promise<void>} 一个 Promise，当初始化完成时解析
+     */
 
   }, {
     key: "install",
     value: function install() {
-      return npminstall({
-        root: this.targetPath,
-        storeDir: this.storeDir,
-        registry: getDefaultRegistry(),
-        pkgs: [{
-          name: this.packageName,
-          version: this.packageVersion
-        }]
-      });
+      return regeneratorRuntime.async(function install$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.next = 2;
+              return regeneratorRuntime.awrap(this.prepare());
+
+            case 2:
+              return _context3.abrupt("return", npminstall({
+                root: this.targetPath,
+                storeDir: this.storeDir,
+                registry: getDefaultRegistry(),
+                pkgs: [{
+                  name: this.packageName,
+                  version: this.packageVersion
+                }]
+              }));
+
+            case 3:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
     } // 更新包
 
   }, {
@@ -98,6 +179,27 @@ function () {
       } else {
         return null;
       }
+    }
+  }, {
+    key: "catchFilePath",
+    get: function get() {
+      return path.resolve(this.storeDir, "_".concat(this.catchFilePathPrefix, "@").concat(this.packageVersion, "@").concat(this.catchFilePathEnd));
+    }
+  }, {
+    key: "catchFilePathPrefix",
+    get: function get() {
+      return this.packageName.replace('/', '_');
+    }
+  }, {
+    key: "catchFilePathEnd",
+    get: function get() {
+      var endIndex = this.packageName.indexOf('/');
+
+      if (endIndex === -1) {
+        return this.packageName;
+      }
+
+      return this.packageName.slice(0, endIndex);
     }
   }]);
 
