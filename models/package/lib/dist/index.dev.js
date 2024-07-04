@@ -239,11 +239,15 @@ function () {
       return path.resolve(this.storeDir, "_".concat(this.catchFilePathPrefix, "@").concat(packageVersion, "@").concat(this.catchFilePathEnd));
     }
     /**
-     * 获取根文件路径
-     * 此函数用于获取指定目录下 package.json 文件中的 main 或 lib 属性所对应的文件路径
-     * 如果目录下不存在 package.json 文件，或者文件中没有 main 或 lib 属性，函数将返回 null
-     * @param {string} targetPath - 要检查的目标路径
-     * @returns {string|null} - 格式化后的文件路径，如果获取失败或没有相关属性，则返回 null
+     * 获取入口文件的完整文件路径
+     * 这个方法首先检查 this.storeDir 是否存在
+     * 如果存在，它使用 this.catchFilePath 作为参数调用 _getRootFile 函数
+     * 如果 this.storeDir 不存在，它使用 this.targetPath 作为参数调用 _getRootFile 函数
+     * _getRootFile 函数内部实现了具体的逻辑来获取入口文件路径
+     * 如果找到了入口文件路径，这个方法就返回该路径
+     * 如果没有找到（包括 _getRootFile 函数返回 null），这个方法也返回 null
+     *
+     * @returns {String|Null} 入口文件的完整文件路径，如果没有找到则为 null
      */
 
   }, {
