@@ -1,8 +1,6 @@
 "use strict";
 
-var LOWEST_NODE_VERSION = '14.0.0';
 var DEFAULT_CLI_HOME = '.wf-cli-dev';
 module.exports = {
-  LOWEST_NODE_VERSION: LOWEST_NODE_VERSION,
   DEFAULT_CLI_HOME: DEFAULT_CLI_HOME
 };

@@ -34,6 +34,7 @@ class Command {
   /**
    * 检查当前 Node 版本是否符合要求
    * 如果版本过低，将抛出错误
+   * @private
    */
   _checkNodeVersion() {
     // 1. 获取当前node版本号
