@@ -33,13 +33,21 @@ function () {
     }
 
     this._args = args;
-    this.checkNodeVersion();
-    this.initArgs();
+
+    this._checkNodeVersion();
+
+    this._initArgs();
   }
+  /**
+   * 初始化命令行参数
+   * 这个函数用于处理命令行参数，它将最后一个参数赋值给 _cmd 属性
+   * @private
+   */
+
 
   _createClass(Command, [{
-    key: "initArgs",
-    value: function initArgs() {
+    key: "_initArgs",
+    value: function _initArgs() {
       this._cmd = this._args.pop();
     }
     /**
@@ -48,8 +56,8 @@ function () {
      */
 
   }, {
-    key: "checkNodeVersion",
-    value: function checkNodeVersion() {
+    key: "_checkNodeVersion",
+    value: function _checkNodeVersion() {
       // 1. 获取当前node版本号
       var currentVersion = process.version; // 2. 比对最低版本号
 
@@ -59,11 +67,23 @@ function () {
         throw new Error(colors.red("wf-cli \u9700\u8981\u5B89\u88C5 v".concat(LOWEST_NODE_VERSION, " \u4EE5\u4E0A\u7248\u672C\u7684 node")));
       }
     }
+    /**
+     * 初始化函数
+     * 该函数用于初始化一个操作。当前该函数作为示例，提示需要实现 init 方法。
+     * @throws {Error} 如果 init 方法未实现，将抛出一个错误
+     */
+
   }, {
     key: "init",
     value: function init() {
       throw new Error(colors.red('必须实现 init 方法'));
     }
+    /**
+     * 执行函数
+     * 该函数用于初始化一个操作。当前该函数作为示例，提示需要实现 exec 方法。
+     * @throws {Error} 如果 exec 方法未实现，将抛出一个错误
+     */
+
   }, {
     key: "exec",
     value: function exec() {
