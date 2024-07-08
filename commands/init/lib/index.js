@@ -1,10 +1,21 @@
 'use strict'
 
-module.exports = init
+const Command = require('@wf-cli-dev/command')
+
+class InitCommand extends Command {
+  constructor(args) {
+    super(args)
+    this.init()
+    this.exec()
+  }
+
+  init() {}
+
+  exec() {}
+}
 
 function init(...args) {
-  const projectName = args[0]
-  const options = args[1]
-  const command = args.at(-1)
-  // console.log(projectName, options, command)
+  new InitCommand(args)
 }
+
+module.exports = init

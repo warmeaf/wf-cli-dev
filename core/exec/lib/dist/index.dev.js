@@ -103,7 +103,11 @@ function exec() {
           log.verbose('rootFile', rootFile);
 
           if (rootFile) {
-            require(rootFile).apply(void 0, args);
+            try {
+              require(rootFile).apply(void 0, args);
+            } catch (e) {
+              log.error(e.message);
+            }
           }
 
         case 30:

@@ -11,7 +11,6 @@ const existsSync = require('fs').existsSync
 const path = require('path')
 const pkg = require('../package.json')
 const log = require('@wf-cli-dev/log')
-const init = require('@wf-cli-dev/init')
 const exec = require('@wf-cli-dev/exec')
 const constant = require('./const')
 const program = new commander.Command()
@@ -38,21 +37,6 @@ async function prepare() {
 // 检查包版本号
 function checkPkgVersion() {
   log.notice('wf-cli 版本', pkg.version)
-}
-
-// 检查node版本号
-function checkNodeVersion() {
-  // 1. 获取当前node版本号
-  const currentVersion = process.version
-  // 2. 比对最低版本号
-  const lowestVersion = constant.LOWEST_NODE_VERSION
-  if (!semver.gte(currentVersion, lowestVersion)) {
-    throw new Error(
-      colors.red(
-        `wf-cli 需要安装 v${constant.LOWEST_NODE_VERSION} 以上版本的 node`
-      )
-    )
-  }
 }
 
 // 检查Root账户

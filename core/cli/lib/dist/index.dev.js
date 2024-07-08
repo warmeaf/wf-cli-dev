@@ -20,8 +20,6 @@ var pkg = require('../package.json');
 
 var log = require('@wf-cli-dev/log');
 
-var init = require('@wf-cli-dev/init');
-
 var exec = require('@wf-cli-dev/exec');
 
 var constant = require('./const');
@@ -79,18 +77,6 @@ function prepare() {
 
 function checkPkgVersion() {
   log.notice('wf-cli 版本', pkg.version);
-} // 检查node版本号
-
-
-function checkNodeVersion() {
-  // 1. 获取当前node版本号
-  var currentVersion = process.version; // 2. 比对最低版本号
-
-  var lowestVersion = constant.LOWEST_NODE_VERSION;
-
-  if (!semver.gte(currentVersion, lowestVersion)) {
-    throw new Error(colors.red("wf-cli \u9700\u8981\u5B89\u88C5 v".concat(constant.LOWEST_NODE_VERSION, " \u4EE5\u4E0A\u7248\u672C\u7684 node")));
-  }
 } // 检查Root账户
 // 如果使用root账户执行，那么创建的文件就是root账户的
 // 因此需要检查root账户，并自动降级

@@ -60,6 +60,10 @@ async function exec(...args) {
   const rootFile = pkg.getRootFilePath()
   log.verbose('rootFile', rootFile)
   if (rootFile) {
-    require(rootFile)(...args)
+    try {
+      require(rootFile)(...args)
+    } catch (e) {
+      log.error(e.message)
+    }
   }
 }
