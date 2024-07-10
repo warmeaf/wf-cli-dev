@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "semver": "^7.6.2",
-    "colors": "^1.4.0",
-    "@wf-cli-dev/log": "file:../../utils/log"
+    "colors": "^1.4.0"
   }
 }

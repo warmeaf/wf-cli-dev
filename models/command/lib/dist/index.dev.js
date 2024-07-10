@@ -10,8 +10,6 @@ var colors = require('colors');
 
 var semver = require('semver');
 
-var log = require('@wf-cli-dev/log');
-
 var LOWEST_NODE_VERSION = '14.0.0';
 
 var Command =

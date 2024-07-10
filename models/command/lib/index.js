@@ -2,7 +2,6 @@
 
 const colors = require('colors')
 const semver = require('semver')
-const log = require('@wf-cli-dev/log')
 const LOWEST_NODE_VERSION = '14.0.0'
 
 class Command {

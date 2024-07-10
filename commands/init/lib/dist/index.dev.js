@@ -18,7 +18,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var fs = require('fs');
+
+var inquirer = require('inquirer');
+
+var fse = require('fs-extra');
+
 var Command = require('@wf-cli-dev/command');
+
+var log = require('@wf-cli-dev/log');
+
+var prompt = inquirer.createPromptModule();
 
 var InitCommand =
 /*#__PURE__*/
@@ -37,14 +47,103 @@ function (_Command) {
     _this.exec();
 
     return _this;
-  }
+  } // 初始化参数
+
 
   _createClass(InitCommand, [{
     key: "init",
     value: function init() {}
   }, {
     key: "exec",
-    value: function exec() {}
+    value: function exec() {
+      return regeneratorRuntime.async(function exec$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              _context.next = 3;
+              return regeneratorRuntime.awrap(this.prepare());
+
+            case 3:
+              _context.next = 8;
+              break;
+
+            case 5:
+              _context.prev = 5;
+              _context.t0 = _context["catch"](0);
+              log.error(_context.t0.message);
+
+            case 8:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this, [[0, 5]]);
+    }
+  }, {
+    key: "prepare",
+    value: function prepare() {
+      var _ref, action;
+
+      return regeneratorRuntime.async(function prepare$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (this._isCwdEmpty()) {
+                _context2.next = 12;
+                break;
+              }
+
+              _context2.next = 3;
+              return regeneratorRuntime.awrap(prompt({
+                type: 'list',
+                name: 'action',
+                message: '当前目录不为空，继续初始化项目吗？',
+                choices: [{
+                  name: '清空当前目录',
+                  value: true
+                }, {
+                  name: '放弃初始化，退出',
+                  value: false
+                }]
+              }));
+
+            case 3:
+              _ref = _context2.sent;
+              action = _ref.action;
+
+              if (action) {
+                _context2.next = 9;
+                break;
+              }
+
+              return _context2.abrupt("return");
+
+            case 9:
+              // 清空文件夹里的内容
+              fse.emptyDirSync(process.cwd());
+
+            case 10:
+              _context2.next = 12;
+              break;
+
+            case 12:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "_isCwdEmpty",
+    value: function _isCwdEmpty() {
+      var files = fs.readdirSync(process.cwd()); // 过滤隐藏文件
+
+      files = files.filter(function (f) {
+        return !f.startsWith('.') && f !== 'node_modules';
+      });
+      return !files || files.length === 0;
+    }
   }]);
 
   return InitCommand;
