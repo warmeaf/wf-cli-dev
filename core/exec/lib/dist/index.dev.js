@@ -32,6 +32,9 @@ function exec() {
       storeDir,
       pkg,
       rootFile,
+      argsString,
+      code,
+      child,
       _args = arguments;
 
   return regeneratorRuntime.async(function exec$(_context) {
@@ -105,29 +108,20 @@ function exec() {
 
           if (rootFile) {
             try {
-              require(rootFile).apply(void 0, args); // const cmd = args.pop()
-              // const o = Object.create(null)
-              // Object.keys(cmd).forEach((key) => {
-              //   if (cmd.hasOwnProperty(key)) {
-              //     o[key] = cmd[key]
-              //   }
-              // })
-              // console.log('o', o)
-              // const code = `require(${rootFile})(...args)`
-              // const code = 'console.log(1)'
-              // const child = spawn('node', ['-e', code], {
-              //   cwd: process.cwd(),
-              //   stdio: 'inherit',
-              // })
-              // child.on('exit', (e) => {
-              //   log.verbose('命令执行成功：' + e)
-              //   process.exit(e)
-              // })
-              // child.on('error', (e) => {
-              //   log.error(e.message)
-              //   process.exit(1)
-              // })
-
+              argsString = JSON.stringify(args.slice(0, args.length - 1));
+              code = "require('".concat(rootFile, "')(").concat(argsString, ")");
+              child = spawn('node', ['-e', code], {
+                cwd: process.cwd(),
+                stdio: 'inherit'
+              });
+              child.on('exit', function (e) {
+                log.verbose('命令执行成功：' + e);
+                process.exit(e);
+              });
+              child.on('error', function (e) {
+                log.error(e.message);
+                process.exit(1);
+              });
             } catch (e) {
               log.error(e.message);
             }

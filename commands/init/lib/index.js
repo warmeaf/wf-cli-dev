@@ -8,6 +8,8 @@ const log = require('@wf-cli-dev/log')
 const prompt = inquirer.createPromptModule()
 
 class InitCommand extends Command {
+  projectName = ''
+  force = null
   constructor(args) {
     super(args)
     this.init()
@@ -15,7 +17,10 @@ class InitCommand extends Command {
   }
 
   // 初始化参数
-  init() {}
+  init() {
+    this.projectName = this.args[0]
+    this.force = this.args[1]?.force || false
+  }
 
   async exec() {
     try {
@@ -32,26 +37,41 @@ class InitCommand extends Command {
     // 1. 判断当前目录是否为空
     if (!this._isCwdEmpty()) {
       // 1.1. 询问用户是否继续创建
-      const { action } = await prompt({
-        type: 'list',
-        name: 'action',
-        message: '当前目录不为空，继续初始化项目吗？',
-        choices: [
-          {
-            name: '清空当前目录',
-            value: true,
-          },
-          {
-            name: '放弃初始化，退出',
-            value: false,
-          },
-        ],
-      })
-      if (!action) {
-        return
-      } else {
-        // 清空文件夹里的内容
-        fse.emptyDirSync(process.cwd())
+      let isContinue = true
+      if (!this.force) {
+        isContinue = (
+          await prompt({
+            type: 'list',
+            name: 'isContinue',
+            message: '当前目录不为空，继续初始化项目吗？',
+            choices: [
+              {
+                name: '初始化项目，清空当前目录',
+                value: true,
+              },
+              {
+                name: '放弃初始化，退出',
+                value: false,
+              },
+            ],
+          })
+        ).isContinue
+      }
+
+      if (isContinue) {
+        // 给用户二次确认
+        isContinue = (
+          await prompt({
+            type: 'confirm',
+            name: 'isContinue',
+            message: '请确认是否清空当前目录',
+            default: false,
+          })
+        ).isContinue
+        if (isContinue) {
+          // 清空文件夹里的内容
+          fse.emptyDirSync(process.cwd())
+        }
       }
     } else {
     }
@@ -65,7 +85,7 @@ class InitCommand extends Command {
   }
 }
 
-function init(...args) {
+function init(args) {
   new InitCommand(args)
 }
 

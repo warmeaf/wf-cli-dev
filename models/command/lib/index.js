@@ -6,8 +6,12 @@ const LOWEST_NODE_VERSION = '14.0.0'
 
 class Command {
   constructor(args) {
+    console.log(args)
     if (!args) {
       throw new Error(colors.red('未传入参数'))
+    }
+    if(!args[0]) {
+      throw new Error(colors.red('命令不能为空'))
     }
     if (!Array.isArray(args)) {
       throw new Error(colors.red('参数必须是数组类型'))
@@ -16,9 +20,9 @@ class Command {
       throw new Error(colors.red('参数列表不能为空'))
     }
 
-    this._args = args
+    this.args = args
     this._checkNodeVersion()
-    this._initArgs()
+    // this._initArgs()
   }
 
   /**

@@ -18,8 +18,14 @@ function () {
   function Command(args) {
     _classCallCheck(this, Command);
 
+    console.log(args);
+
     if (!args) {
       throw new Error(colors.red('未传入参数'));
+    }
+
+    if (!args[0]) {
+      throw new Error(colors.red('命令不能为空'));
     }
 
     if (!Array.isArray(args)) {
@@ -30,11 +36,10 @@ function () {
       throw new Error(colors.red('参数列表不能为空'));
     }
 
-    this._args = args;
+    this.args = args;
 
-    this._checkNodeVersion();
+    this._checkNodeVersion(); // this._initArgs()
 
-    this._initArgs();
   }
   /**
    * 初始化命令行参数

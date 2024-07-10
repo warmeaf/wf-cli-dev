@@ -60,30 +60,20 @@ async function exec(...args) {
   log.verbose('rootFile', rootFile)
   if (rootFile) {
     try {
-      require(rootFile)(...args)
-      // const cmd = args.pop()
-      // const o = Object.create(null)
-      // Object.keys(cmd).forEach((key) => {
-      //   if (cmd.hasOwnProperty(key)) {
-      //     o[key] = cmd[key]
-      //   }
-      // })
-      // console.log('o', o)
-
-      // const code = `require(${rootFile})(...args)`
-      // const code = 'console.log(1)'
-      // const child = spawn('node', ['-e', code], {
-      //   cwd: process.cwd(),
-      //   stdio: 'inherit',
-      // })
-      // child.on('exit', (e) => {
-      //   log.verbose('命令执行成功：' + e)
-      //   process.exit(e)
-      // })
-      // child.on('error', (e) => {
-      //   log.error(e.message)
-      //   process.exit(1)
-      // })
+      const argsString  = JSON.stringify(args.slice(0, args.length - 1))
+      const code = `require('${rootFile}')(${argsString})`
+      const child = spawn('node', ['-e', code], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      })
+      child.on('exit', (e) => {
+        log.verbose('命令执行成功：' + e)
+        process.exit(e)
+      })
+      child.on('error', (e) => {
+        log.error(e.message)
+        process.exit(1)
+      })
     } catch (e) {
       log.error(e.message)
     }

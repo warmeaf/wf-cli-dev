@@ -83,14 +83,14 @@ function (_Command) {
   }, {
     key: "prepare",
     value: function prepare() {
-      var _ref, action;
+      var _ref, action, _ref2, _action;
 
       return regeneratorRuntime.async(function prepare$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               if (this._isCwdEmpty()) {
-                _context2.next = 12;
+                _context2.next = 13;
                 break;
               }
 
@@ -100,7 +100,7 @@ function (_Command) {
                 name: 'action',
                 message: '当前目录不为空，继续初始化项目吗？',
                 choices: [{
-                  name: '清空当前目录',
+                  name: '初始化项目，清空当前目录',
                   value: true
                 }, {
                   name: '放弃初始化，退出',
@@ -112,22 +112,33 @@ function (_Command) {
               _ref = _context2.sent;
               action = _ref.action;
 
-              if (action) {
-                _context2.next = 9;
+              if (!action) {
+                _context2.next = 11;
                 break;
               }
 
-              return _context2.abrupt("return");
+              _context2.next = 8;
+              return regeneratorRuntime.awrap(prompt({
+                type: 'confirm',
+                name: 'action',
+                message: '请确认是否清空当前目录',
+                "default": false
+              }));
 
-            case 9:
-              // 清空文件夹里的内容
-              fse.emptyDirSync(process.cwd());
+            case 8:
+              _ref2 = _context2.sent;
+              _action = _ref2.action;
 
-            case 10:
-              _context2.next = 12;
+              if (_action) {
+                // 清空文件夹里的内容
+                fse.emptyDirSync(process.cwd());
+              }
+
+            case 11:
+              _context2.next = 13;
               break;
 
-            case 12:
+            case 13:
             case "end":
               return _context2.stop();
           }
@@ -149,11 +160,7 @@ function (_Command) {
   return InitCommand;
 }(Command);
 
-function init() {
-  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
+function init(args) {
   new InitCommand(args);
 }
 
