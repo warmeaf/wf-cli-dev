@@ -49,6 +49,13 @@ class InitCommand extends Command {
     }
   }
 
+  /**
+   * 下载模板
+   * @param {Object} projectInfo - 项目信息
+   * @param {string} projectInfo.project.projectTemplate - 项目模板
+   * @param {string} projectInfo.project.projectVersion - 项目版本号
+   * @returns {Promise<void>} - 下载或更新完成后的 Promise
+   */
   async _downloadTemplate(projectInfo) {
     const homePath = process.env.CLI_HOME_PATH
     const targetPath = path.resolve(homePath, 'templates')
@@ -71,6 +78,11 @@ class InitCommand extends Command {
     }
   }
 
+  /**
+   * 准备工作，包括获取项目模板信息、处理当前目录非空的情况
+   * @throws {Error} 如果获取项目模板信息失败或模板信息为空，抛出错误
+   * @returns {Promise} 一个 Promise，当初始化流程完成后，解析为项目信息
+   */
   async _prepare() {
     const res = await getProjectTemplate()
     if (!res || !Array.isArray(res) || res.length === 0) {
