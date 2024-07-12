@@ -57,7 +57,7 @@ function checkUserHome() {
 
 // 检查环境变量
 function checkEnv() {
-  const dotenvPath = path.resolve(homedir, '.env')
+  const dotenvPath = path.resolve(process.cwd(), '.env')
   if (existsSync(dotenvPath)) {
     // 用于加载 .env 文件中的环境变量到 Node.js 的 process.env 对象中
     dotenv.config({
