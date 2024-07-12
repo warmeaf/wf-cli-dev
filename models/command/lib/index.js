@@ -6,7 +6,6 @@ const LOWEST_NODE_VERSION = '14.0.0'
 
 class Command {
   constructor(args) {
-    console.log(args)
     if (!args) {
       throw new Error(colors.red('未传入参数'))
     }

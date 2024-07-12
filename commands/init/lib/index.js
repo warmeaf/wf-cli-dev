@@ -6,6 +6,7 @@ const fse = require('fs-extra')
 const Command = require('@wf-cli-dev/command')
 const semver = require('semver')
 const log = require('@wf-cli-dev/log')
+const { getProjectTemplate } = require('./api/index')
 
 const TYPE_PROJECT = 'project'
 const TYPE_COMPONENT = 'component'
@@ -13,6 +14,7 @@ const TYPE_COMPONENT = 'component'
 class InitCommand extends Command {
   projectName = ''
   force = null
+  template = null
   constructor(args) {
     super(args)
     this.init()
@@ -28,15 +30,35 @@ class InitCommand extends Command {
   async exec() {
     try {
       // 1. 准备阶段
-      const res = await this._prepare()
-      // 2. 下载模板
-      // 3. 安装模板
+      const projectInfo = await this._prepare()
+      console.log(projectInfo)
+      if (projectInfo) {
+        // 2. 下载模板
+        await this._downloadTemplate()
+        // 3. 安装模板
+      }
     } catch (e) {
       log.error(e.message)
     }
   }
 
+  async _downloadTemplate() {
+    // 选择项目模板
+    // 1. 通过 API 获取模板信息
+    // 1.1. 通过egg.js搭建一套后端系统
+    // 1.2. 通过npm存储项目模板
+    // 1.3. 讲项目模板信息存储到mongodb数据库中
+    // 1.4. 通过egg.js获取mongodb中的数据并通过api返回
+  }
+
   async _prepare() {
+    const res = await getProjectTemplate()
+    if (!res || !Array.isArray(res) || res.length === 0) {
+      throw new Error('没有找到项目模板信息')
+    } else {
+      this.template = res
+    }
+
     // 1. 判断当前目录是否为空
     if (!this._isCwdEmpty()) {
       // 1.1. 询问用户是否继续创建
@@ -88,6 +110,7 @@ class InitCommand extends Command {
   }
 
   async _getProjectInfo() {
+    let project = {}
     // 1. 选择项目类型
     const { type } = await inquirer.prompt({
       type: 'list',
@@ -106,7 +129,7 @@ class InitCommand extends Command {
     })
     if (type === TYPE_PROJECT) {
       // 2. 获取项目基本信息
-      const projectInfo = await inquirer.prompt([
+      project = await inquirer.prompt([
         {
           type: 'input',
           name: 'projectName',
@@ -152,10 +175,25 @@ class InitCommand extends Command {
             }
           },
         },
+        {
+          type: 'list',
+          name: 'projectTemplate',
+          message: '请选择项目模板',
+          choices: this.template.map((item) => {
+            return {
+              name: item.name,
+              value: item.npmName,
+            }
+          }),
+        },
       ])
-      console.log(projectInfo)
     } else if (type === TYPE_COMPONENT) {
       // 3. 获取组件描述信息
+    }
+
+    return {
+      type,
+      project,
     }
   }
 
