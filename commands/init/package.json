@@ -33,6 +33,7 @@
     "@wf-cli-dev/command": "file:../../models/command",
     "@wf-cli-dev/log": "file:../../utils/log",
     "@wf-cli-dev/request": "file:../../utils/request",
+    "@wf-cli-dev/package": "file:../../models/package",
     "fs-extra": "^11.2.0",
     "inquirer": "^7.3.3",
     "semver": "^7.6.2"

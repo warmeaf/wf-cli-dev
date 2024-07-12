@@ -1,4 +1,10 @@
 'use strict'
+// 选择项目模板
+// 1. 通过 API 获取模板信息
+// 1.1. 通过egg.js搭建一套后端系统
+// 1.2. 通过npm存储项目模板
+// 1.3. 讲项目模板信息存储到mongodb数据库中
+// 1.4. 通过egg.js获取mongodb中的数据并通过api返回
 
 const fs = require('fs')
 const inquirer = require('inquirer')
@@ -6,6 +12,7 @@ const fse = require('fs-extra')
 const Command = require('@wf-cli-dev/command')
 const semver = require('semver')
 const log = require('@wf-cli-dev/log')
+const Package = require('@wf-cli-dev/package')
 const { getProjectTemplate } = require('./api/index')
 
 const TYPE_PROJECT = 'project'
@@ -31,10 +38,10 @@ class InitCommand extends Command {
     try {
       // 1. 准备阶段
       const projectInfo = await this._prepare()
-      console.log(projectInfo)
+      // console.log(projectInfo)
       if (projectInfo) {
         // 2. 下载模板
-        await this._downloadTemplate()
+        await this._downloadTemplate(projectInfo)
         // 3. 安装模板
       }
     } catch (e) {
@@ -42,13 +49,26 @@ class InitCommand extends Command {
     }
   }
 
-  async _downloadTemplate() {
-    // 选择项目模板
-    // 1. 通过 API 获取模板信息
-    // 1.1. 通过egg.js搭建一套后端系统
-    // 1.2. 通过npm存储项目模板
-    // 1.3. 讲项目模板信息存储到mongodb数据库中
-    // 1.4. 通过egg.js获取mongodb中的数据并通过api返回
+  async _downloadTemplate(projectInfo) {
+    const homePath = process.env.CLI_HOME_PATH
+    const targetPath = path.resolve(homePath, 'templates')
+    const storeDir = path.resolve(homePath, 'templates', 'node_modules')
+    const { projectTemplate: packageName } = projectInfo.project
+    const packageVersion = this.template.find(
+      (item) => item.npmName === packageName
+    ).version
+    const pkg = new Package({
+      targetPath,
+      storeDir,
+      packageName,
+      packageVersion,
+    })
+    // console.log(pkg)
+    if (await pkg.isExist()) {
+      await pkg.update()
+    } else {
+      await pkg.install()
+    }
   }
 
   async _prepare() {
