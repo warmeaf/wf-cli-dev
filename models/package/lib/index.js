@@ -151,8 +151,8 @@ class Package {
           },
         ],
       })
-      this.packageVersion = latestVersion
     }
+    this.packageVersion = latestVersion
   }
 
   getLatestCatchFilePath(packageVersion) {
