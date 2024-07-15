@@ -21,7 +21,7 @@ const TYPE_COMPONENT = 'component'
 class InitCommand extends Command {
   projectName = ''
   force = null
-  template = null
+  templates = null
   constructor(args) {
     super(args)
     this.init()
@@ -39,31 +39,32 @@ class InitCommand extends Command {
       // 1. 准备阶段
       const projectInfo = await this._prepare()
       // console.log(projectInfo)
-      if (projectInfo) {
+      if (projectInfo && projectInfo.template) {
         // 2. 下载模板
         await this._downloadTemplate(projectInfo)
         // 3. 安装模板
+        await this._installTemplate(projectInfo)
       }
     } catch (e) {
       log.error(e.message)
     }
   }
 
+  async _installTemplate(projectInfo) {
+    console.log(projectInfo)
+  }
+
   /**
    * 下载模板
-   * @param {Object} projectInfo - 项目信息
-   * @param {string} projectInfo.project.projectTemplate - 项目模板
-   * @param {string} projectInfo.project.projectVersion - 项目版本号
    * @returns {Promise<void>} - 下载或更新完成后的 Promise
    */
   async _downloadTemplate(projectInfo) {
     const homePath = process.env.CLI_HOME_PATH
     const targetPath = path.resolve(homePath, 'templates')
     const storeDir = path.resolve(homePath, 'templates', 'node_modules')
-    const { projectTemplate: packageName } = projectInfo.project
-    const packageVersion = this.template.find(
-      (item) => item.npmName === packageName
-    ).version
+    const { npmName: packageName, version: packageVersion } =
+      projectInfo.template
+
     const pkg = new Package({
       targetPath,
       storeDir,
@@ -88,7 +89,7 @@ class InitCommand extends Command {
     if (!res || !Array.isArray(res) || res.length === 0) {
       throw new Error('没有找到项目模板信息')
     } else {
-      this.template = res
+      this.templates = res
     }
 
     // 1. 判断当前目录是否为空
@@ -166,7 +167,7 @@ class InitCommand extends Command {
           type: 'input',
           name: 'projectName',
           message: '请输入项目名称',
-          default: 'my-project',
+          default: this.projectName,
           // 1. 首字符必须是字母
           // 2. 尾字符必须是字母或数字
           // 3. 特殊字符仅仅允许-_
@@ -211,7 +212,7 @@ class InitCommand extends Command {
           type: 'list',
           name: 'projectTemplate',
           message: '请选择项目模板',
-          choices: this.template.map((item) => {
+          choices: this.templates.map((item) => {
             return {
               name: item.name,
               value: item.npmName,
@@ -223,9 +224,18 @@ class InitCommand extends Command {
       // 3. 获取组件描述信息
     }
 
+    const { projectTemplate: packageName } = project
+    const currentTemplate = this.templates.find(
+      (item) => item.npmName === packageName
+    )
+
     return {
-      type,
-      project,
+      projectType: type,
+      projectName: project.projectName,
+      projectVersion: project.projectVersion,
+      template: {
+        ...currentTemplate,
+      },
     }
   }
 
