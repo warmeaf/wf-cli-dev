@@ -13,11 +13,6 @@ const httpClient = got.extend({
   prefixUrl: PRE_FIX_URL,
   timeout: TIMEOUT,
   hooks: {
-    // beforeRequest: [
-    //   options => {
-    //     options.headers['User-Agent'] = 'MyApp';
-    //   },
-    // ],
     beforeRetry: [
       (response, retryCount) => {
         if (retryCount > 3) {
