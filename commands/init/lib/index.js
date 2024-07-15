@@ -259,7 +259,11 @@ class InitCommand extends Command {
  * @param {Arrary} args - 初始化参数
  */
 function init(args) {
-  new InitCommand(args)
+  try {
+    new InitCommand(args)
+  } catch (e) {
+    log.error(e.message)
+  }
 }
 
 module.exports = init

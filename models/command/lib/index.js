@@ -21,16 +21,6 @@ class Command {
 
     this.args = args
     this._checkNodeVersion()
-    // this._initArgs()
-  }
-
-  /**
-   * 初始化命令行参数
-   * 这个函数用于处理命令行参数，它将最后一个参数赋值给 _cmd 属性
-   * @private
-   */
-  _initArgs() {
-    this._cmd = this._args.pop()
   }
 
   /**
