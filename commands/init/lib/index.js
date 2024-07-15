@@ -13,15 +13,20 @@ const Command = require('@wf-cli-dev/command')
 const semver = require('semver')
 const log = require('@wf-cli-dev/log')
 const Package = require('@wf-cli-dev/package')
+const { execAsync } = require('@wf-cli-dev/utils')
 const { getProjectTemplate } = require('./api/index')
 
-const TYPE_PROJECT = 'project'
-const TYPE_COMPONENT = 'component'
+const {
+  TYPE_PROJECT,
+  TYPE_COMPONENT,
+  TEMPLATEE_TYPE_NORMAL,
+} = require('./const')
 
 class InitCommand extends Command {
   projectName = ''
   force = null
   templates = null
+  templatePkg = null
   constructor(args) {
     super(args)
     this.init()
@@ -38,7 +43,7 @@ class InitCommand extends Command {
     try {
       // 1. 准备阶段
       const projectInfo = await this._prepare()
-      // console.log(projectInfo)
+      console.log(projectInfo)
       if (projectInfo && projectInfo.template) {
         // 2. 下载模板
         await this._downloadTemplate(projectInfo)
@@ -51,7 +56,63 @@ class InitCommand extends Command {
   }
 
   async _installTemplate(projectInfo) {
-    console.log(projectInfo)
+    if (!projectInfo.template.type) {
+      projectInfo.template.type = TEMPLATEE_TYPE_NORMAL
+    }
+    if (projectInfo.template.type === TEMPLATEE_TYPE_NORMAL) {
+      // 标准安装
+      this._installNormalTemplate(projectInfo)
+    } else {
+      // 自定义安装
+      this._installCustomTemplate(projectInfo)
+    }
+  }
+
+  async _installNormalTemplate(projectInfo) {
+    const templatePath = path.resolve(
+      this.templatePkg.catchFilePath,
+      'template'
+    )
+    const targetPath = path.resolve(process.cwd())
+    log.info('开始安装模板...')
+    fse.ensureDir(targetPath)
+    fse.ensureDir(targetPath)
+    fse.copySync(templatePath, targetPath)
+    log.success('安装模板成功')
+    // 安装依赖
+    if (projectInfo.template.installCommand) {
+      log.info('开始安装依赖...')
+      const installCommand = projectInfo.template.installCommand.split(' ')
+      const cmd = installCommand[0]
+      const args = installCommand[1]
+      const res = await execAsync(cmd, [args], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      })
+      if (parseInt(res) !== 0) {
+        throw new Error('安装依赖失败')
+      } else {
+        log.success('安装依赖成功')
+      }
+    }
+    // 启动项目
+    if (projectInfo.template.startCommand) {
+      log.info('开始启动项目...')
+      const startCommand = projectInfo.template.startCommand.split(' ')
+      const cmd = startCommand[0]
+      const args = startCommand[1]
+      const res = await execAsync(cmd, [args], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      })
+      if (parseInt(res) !== 0) {
+        throw new Error('启动项目失败')
+      }
+    }
+  }
+
+  async _installCustomTemplate(projectInfo) {
+    console.log('开始安装自定义模板')
   }
 
   /**
@@ -65,17 +126,16 @@ class InitCommand extends Command {
     const { npmName: packageName, version: packageVersion } =
       projectInfo.template
 
-    const pkg = new Package({
+    this.templatePkg = new Package({
       targetPath,
       storeDir,
       packageName,
       packageVersion,
     })
-    // console.log(pkg)
-    if (await pkg.isExist()) {
-      await pkg.update()
+    if (await this.templatePkg.isExist()) {
+      await this.templatePkg.update()
     } else {
-      await pkg.install()
+      await this.templatePkg.install()
     }
   }
 

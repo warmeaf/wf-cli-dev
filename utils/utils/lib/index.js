@@ -1,5 +1,6 @@
 'use strict'
 const path = require('path')
+const cp = require('child_process')
 
 /**
  * 检查给定的值是否为对象
@@ -28,7 +29,41 @@ function formatPath(p) {
   }
 }
 
+/**
+ * 在 Node.js 中启动一个新的子进程，执行指定的命令。
+ *
+ * 这个函数接受三个参数：命令、命令参数数组和一个可选的配置对象。
+ * 在 Windows 系统中，它会使用 'cmd' 作为命令，并将 '/c' 作为参数之一，以执行给定的命令。
+ * 在其他操作系统中，它会直接使用给定的命令。
+ *
+ * @param {string} command - 要执行的命令。
+ * @param {Array} args - 命令的参数。
+ * @param {Object} options - 可选的配置对象。
+ * @return {ChildProcess} 一个子进程对象。
+ * @throws {Error} 如果命令为空，则抛出错误。
+ */
+function exec(command, args, options) {
+  const win32 = process.platform === 'win32'
+  const cmd = win32 ? 'cmd' : command
+  const cmdArgs = win32 ? ['/c'].concat(command, args) : args
+  return cp.spawn(cmd, cmdArgs, options)
+}
+
+function execAsync(command, args, options) {
+  return new Promise((resolve, reject) => {
+    const child = exec(command, args, options)
+    child.on('error', (err) => {
+      reject(err)
+    })
+    child.on('exit', (data) => {
+      resolve(data)
+    })
+  })
+}
+
 module.exports = {
   isObject,
   formatPath,
+  exec,
+  execAsync,
 }

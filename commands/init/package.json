@@ -34,6 +34,7 @@
     "@wf-cli-dev/log": "file:../../utils/log",
     "@wf-cli-dev/request": "file:../../utils/request",
     "@wf-cli-dev/package": "file:../../models/package",
+    "@wf-cli-dev/utils": "file:../../utils/utils",
     "fs-extra": "^11.2.0",
     "inquirer": "^7.3.3",
     "semver": "^7.6.2"
