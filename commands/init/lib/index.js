@@ -231,16 +231,16 @@ class InitCommand extends Command {
           name: 'projectName',
           message: '请输入项目名称',
           default: this.projectName,
-          // 1. 首字符必须是字母
-          // 2. 尾字符必须是字母或数字
-          // 3. 特殊字符仅仅允许-_
+          // 1. 首字符必须是小写字母
+          // 2. 尾字符必须是小写字母或数字
+          // 3. 特殊字符仅仅允许-
           validate: function (v) {
             const done = this.async()
-            const projectNameRegex = /^[a-zA-Z][a-zA-Z0-9\-_]*[a-zA-Z0-9]$/
+            const projectNameRegex = /^[a-z][a-z0-9\-]*[a-z0-9]$/
             setTimeout(function () {
               if (!projectNameRegex.test(v)) {
                 done(
-                  '请输入合法的项目名称（首字符必须是字母，尾字符必须是字母或数字，特殊字符仅仅允许-_）'
+                  '请输入合法的项目名称（首字符必须是小写字母，尾字符必须是小写字母或数字，特殊字符仅仅允许-）'
                 )
                 return
               }
