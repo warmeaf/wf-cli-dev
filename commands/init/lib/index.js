@@ -20,6 +20,7 @@ const {
   TYPE_PROJECT,
   TYPE_COMPONENT,
   TEMPLATEE_TYPE_NORMAL,
+  WHITE_COMMANDS,
 } = require('./const')
 
 class InitCommand extends Command {
@@ -61,10 +62,10 @@ class InitCommand extends Command {
     }
     if (projectInfo.template.type === TEMPLATEE_TYPE_NORMAL) {
       // 标准安装
-      this._installNormalTemplate(projectInfo)
+      await this._installNormalTemplate(projectInfo)
     } else {
       // 自定义安装
-      this._installCustomTemplate(projectInfo)
+      await this._installCustomTemplate(projectInfo)
     }
   }
 
@@ -81,38 +82,40 @@ class InitCommand extends Command {
     log.success('安装模板成功')
     // 安装依赖
     if (projectInfo.template.installCommand) {
-      log.info('开始安装依赖...')
-      const installCommand = projectInfo.template.installCommand.split(' ')
-      const cmd = installCommand[0]
-      const args = installCommand[1]
-      const res = await execAsync(cmd, [args], {
-        cwd: process.cwd(),
-        stdio: 'inherit',
-      })
-      if (parseInt(res) !== 0) {
-        throw new Error('安装依赖失败')
-      } else {
-        log.success('安装依赖成功')
-      }
+      const initCommand = projectInfo.template.installCommand.split(' ')
+      await this._execCmd(initCommand, '安装依赖')
     }
     // 启动项目
     if (projectInfo.template.startCommand) {
-      log.info('开始启动项目...')
-      const startCommand = projectInfo.template.startCommand.split(' ')
-      const cmd = startCommand[0]
-      const args = startCommand[1]
-      const res = await execAsync(cmd, [args], {
-        cwd: process.cwd(),
-        stdio: 'inherit',
-      })
-      if (parseInt(res) !== 0) {
-        throw new Error('启动项目失败')
-      }
+      const initCommand = projectInfo.template.startCommand.split(' ')
+      await this._execCmd(initCommand, '启动项目')
     }
   }
 
   async _installCustomTemplate(projectInfo) {
     console.log('开始安装自定义模板')
+  }
+
+  async _execCmd(initCommand, execText) {
+    log.info(`开始${execText}...`)
+    const cmd = WHITE_COMMANDS.includes(initCommand[0]) ? initCommand[0] : null
+    if (!cmd) {
+      throw new Error(
+        `不支持的命令: ${initCommand[0]}，可执行的命令为：${WHITE_COMMANDS.join(
+          ', '
+        )}`
+      )
+    }
+    const args = initCommand[1]
+    const res = await execAsync(cmd, [args], {
+      cwd: process.cwd(),
+      stdio: 'inherit',
+    })
+    if (parseInt(res) !== 0) {
+      throw new Error(`${execText}失败`)
+    } else {
+      log.success(`${execText}成功`)
+    }
   }
 
   /**
