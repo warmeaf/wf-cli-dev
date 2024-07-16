@@ -37,6 +37,8 @@
     "@wf-cli-dev/utils": "file:../../utils/utils",
     "fs-extra": "^11.2.0",
     "inquirer": "^7.3.3",
-    "semver": "^7.6.2"
+    "semver": "^7.6.2",
+    "glob": "^10.4.5",
+    "ejs": "^3.1.10"
   }
 }

@@ -7,13 +7,16 @@
 // 1.4. 通过egg.js获取mongodb中的数据并通过api返回
 
 const fs = require('fs')
+const path = require('path')
 const inquirer = require('inquirer')
 const fse = require('fs-extra')
 const Command = require('@wf-cli-dev/command')
 const semver = require('semver')
+const { glob } = require('glob')
+const ejs = require('ejs')
 const log = require('@wf-cli-dev/log')
 const Package = require('@wf-cli-dev/package')
-const { execAsync } = require('@wf-cli-dev/utils')
+const { execAsync, formatPath } = require('@wf-cli-dev/utils')
 const { getProjectTemplate } = require('./api/index')
 
 const {
@@ -80,6 +83,8 @@ class InitCommand extends Command {
     fse.ensureDir(targetPath)
     fse.copySync(templatePath, targetPath)
     log.success('安装模板成功')
+    // 渲染项目信息到文件中
+    await this._ejsRender(projectInfo)
     // 安装依赖
     if (projectInfo.template.installCommand) {
       const initCommand = projectInfo.template.installCommand.split(' ')
@@ -90,6 +95,54 @@ class InitCommand extends Command {
       const initCommand = projectInfo.template.startCommand.split(' ')
       await this._execCmd(initCommand, '启动项目')
     }
+  }
+
+  /**
+   * 渲染项目信息到文件中
+   * @param {Object} projectInfo - 包含项目名和项目版本的对象
+   * @returns {Promise} - 一个 Promise，当初始渲染完成后解决
+   */
+  async _ejsRender(projectInfo) {
+    const data = {
+      name: projectInfo.projectName,
+      version: projectInfo.projectVersion,
+    }
+    const cwd = process.cwd()
+    return new Promise((resolve, reject) => {
+      glob('**', {
+        cwd,
+        ignore: ['node_modules/**', 'public/**'],
+        nodir: true,
+      })
+        .then((files) => {
+          Promise.all(
+            files.map((file) => {
+              return new Promise((resolve1, reject1) => {
+                const filePath = path.resolve(cwd, file)
+                // console.log(filePath)
+                ejs.renderFile(filePath, data, (err, str) => {
+                  if (err) {
+                    reject1(err)
+                  } else {
+                    // console.log(str)
+                    fse.writeFileSync(filePath, str)
+                    resolve1()
+                  }
+                })
+              })
+            })
+          )
+            .then(() => {
+              resolve()
+            })
+            .catch((err) => {
+              reject(err)
+            })
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
   }
 
   async _installCustomTemplate(projectInfo) {
