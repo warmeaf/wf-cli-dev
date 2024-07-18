@@ -16,7 +16,7 @@ const { glob } = require('glob')
 const ejs = require('ejs')
 const log = require('@wf-cli-dev/log')
 const Package = require('@wf-cli-dev/package')
-const { execAsync, formatPath } = require('@wf-cli-dev/utils')
+const { execAsync } = require('@wf-cli-dev/utils')
 const { getProjectTemplate } = require('./api/index')
 
 const {
