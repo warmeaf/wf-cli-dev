@@ -107,11 +107,12 @@ class InitCommand extends Command {
       name: projectInfo.projectName,
       version: projectInfo.projectVersion,
     }
+    const { renderIgnore = [] } = projectInfo.template
     const cwd = process.cwd()
     return new Promise((resolve, reject) => {
       glob('**', {
         cwd,
-        ignore: ['node_modules/**', 'public/**'],
+        ignore: ['node_modules/**', ...renderIgnore],
         nodir: true,
       })
         .then((files) => {
@@ -276,6 +277,11 @@ class InitCommand extends Command {
         },
       ],
     })
+    this.templates = this.templates.filter((item) => item.tags.includes(type))
+    if (this.templates.length === 0) {
+      throw new Error('没有找到项目/组件模板信息')
+    }
+    // 2. 选择模板
     if (type === TYPE_PROJECT) {
       // 2. 获取项目基本信息
       project = await inquirer.prompt([
