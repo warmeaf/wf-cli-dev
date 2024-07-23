@@ -106,6 +106,7 @@ class InitCommand extends Command {
     const data = {
       name: projectInfo.projectName,
       version: projectInfo.projectVersion,
+      description: projectInfo.projectDescription,
     }
     const { renderIgnore = [] } = projectInfo.template
     const cwd = process.cwd()
@@ -204,7 +205,7 @@ class InitCommand extends Command {
   async _prepare() {
     const res = await getProjectTemplate()
     if (!res || !Array.isArray(res) || res.length === 0) {
-      throw new Error('没有找到项目模板信息')
+      throw new Error('没有找到项目/组件模板信息')
     } else {
       this.templates = res
     }
@@ -281,70 +282,8 @@ class InitCommand extends Command {
     if (this.templates.length === 0) {
       throw new Error('没有找到项目/组件模板信息')
     }
-    // 2. 选择模板
-    if (type === TYPE_PROJECT) {
-      // 2. 获取项目基本信息
-      project = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'projectName',
-          message: '请输入项目名称',
-          default: this.projectName,
-          // 1. 首字符必须是小写字母
-          // 2. 尾字符必须是小写字母或数字
-          // 3. 特殊字符仅仅允许-
-          validate: function (v) {
-            const done = this.async()
-            const projectNameRegex = /^[a-z][a-z0-9\-]*[a-z0-9]$/
-            setTimeout(function () {
-              if (!projectNameRegex.test(v)) {
-                done(
-                  '请输入合法的项目名称（首字符必须是小写字母，尾字符必须是小写字母或数字，特殊字符仅仅允许-）'
-                )
-                return
-              }
-              done(null, true)
-            }, 0)
-          },
-        },
-        {
-          type: 'input',
-          name: 'projectVersion',
-          message: '请输入项目版本号',
-          default: '0.0.1',
-          validate: function (v) {
-            const done = this.async()
-            setTimeout(function () {
-              if (!semver.valid(v)) {
-                done('请输入合法的项目版本号（示例：1.0.1、v1.0.0）')
-                return
-              }
-              done(null, true)
-            }, 0)
-          },
-          filter: function (v) {
-            if (!semver.valid(v)) {
-              return v
-            } else {
-              return semver.valid(v)
-            }
-          },
-        },
-        {
-          type: 'list',
-          name: 'projectTemplate',
-          message: '请选择项目模板',
-          choices: this.templates.map((item) => {
-            return {
-              name: item.name,
-              value: item.npmName,
-            }
-          }),
-        },
-      ])
-    } else if (type === TYPE_COMPONENT) {
-      // 3. 获取组件描述信息
-    }
+    // 2. 获取项目组件基本信息，选择模板
+    project = await this._getInfo(type)
 
     const { projectTemplate: packageName } = project
     const currentTemplate = this.templates.find(
@@ -355,10 +294,95 @@ class InitCommand extends Command {
       projectType: type,
       projectName: project.projectName,
       projectVersion: project.projectVersion,
+      projectDescription: project.projectDescription,
       template: {
         ...currentTemplate,
       },
     }
+  }
+
+  /**
+   * 获取用户输入的信息，包括项目或组件的名称、版本号、描述和模板选择
+   *
+   * @param {string} type - 项目或组件的类型（'TYPE_PROJECT'表示项目，'TYPE_COMPONENT'表示组件）
+   * @return {Promise} - 包含用户输入信息的 Promise
+   */
+  _getInfo(type) {
+    const typeText = type === TYPE_PROJECT ? '项目' : '组件'
+    return inquirer.prompt([
+      {
+        type: 'input',
+        name: 'projectName',
+        message: `请输入${typeText}名称`,
+        default: this.projectName,
+        // 1. 首字符必须是小写字母
+        // 2. 尾字符必须是小写字母或数字
+        // 3. 特殊字符仅仅允许-
+        validate: function (v) {
+          const done = this.async()
+          const projectNameRegex = /^[a-z][a-z0-9\-]*[a-z0-9]$/
+          setTimeout(function () {
+            if (!projectNameRegex.test(v)) {
+              done(
+                `请输入合法的${typeText}名称（首字符必须是小写字母，尾字符必须是小写字母或数字，特殊字符仅仅允许-）`
+              )
+              return
+            }
+            done(null, true)
+          }, 0)
+        },
+      },
+      {
+        type: 'input',
+        name: 'projectVersion',
+        message: `请输入${typeText}版本号`,
+        default: '0.0.1',
+        validate: function (v) {
+          const done = this.async()
+          setTimeout(function () {
+            if (!semver.valid(v)) {
+              done(`请输入合法的${typeText}版本号（示例：1.0.1、v1.0.0）`)
+              return
+            }
+            done(null, true)
+          }, 0)
+        },
+        filter: function (v) {
+          if (!semver.valid(v)) {
+            return v
+          } else {
+            return semver.valid(v)
+          }
+        },
+      },
+      {
+        type: 'input',
+        name: 'projectDescription',
+        message: `请输入${typeText}描述`,
+        default: '',
+        validate: function (v) {
+          const done = this.async()
+          setTimeout(function () {
+            if (!v) {
+              done(`${typeText}描述不能为空`)
+              return
+            }
+            done(null, true)
+          }, 0)
+        },
+      },
+      {
+        type: 'list',
+        name: 'projectTemplate',
+        message: `请选择${typeText}模板`,
+        choices: this.templates.map((item) => {
+          return {
+            name: item.name,
+            value: item.npmName,
+          }
+        }),
+      },
+    ])
   }
 
   /**
