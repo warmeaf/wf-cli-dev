@@ -43,6 +43,7 @@ function formatPath(p) {
  * @throws {Error} 如果命令为空，则抛出错误。
  */
 function exec(command, args, options) {
+  if (!command) throw new Error('exec 函数的第一个参数不能为空')
   const win32 = process.platform === 'win32'
   const cmd = win32 ? 'cmd' : command
   const cmdArgs = win32 ? ['/c'].concat(command, args) : args
