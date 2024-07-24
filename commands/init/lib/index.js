@@ -97,6 +97,10 @@ class InitCommand extends Command {
     }
   }
 
+  async _installCustomTemplate(projectInfo) {
+    console.log('开始安装自定义模板')
+  }
+
   /**
    * 渲染项目信息到文件中
    * @param {Object} projectInfo - 包含项目名和项目版本的对象
@@ -147,10 +151,14 @@ class InitCommand extends Command {
     })
   }
 
-  async _installCustomTemplate(projectInfo) {
-    console.log('开始安装自定义模板')
-  }
-
+  /**
+   * 执行给定的命令并在控制台中显示结果
+   * 如果命令执行失败，将抛出错误
+   *
+   * @param {Array} initCommand - 命令和参数的数组
+   * @param {string} execText - 标识要执行的操作的文本
+   * @throws {Error} 如果命令不支持或执行失败，抛出相应的错误
+   */
   async _execCmd(initCommand, execText) {
     log.info(`开始${execText}...`)
     const cmd = WHITE_COMMANDS.includes(initCommand[0]) ? initCommand[0] : null
