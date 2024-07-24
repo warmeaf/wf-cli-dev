@@ -1,6 +1,6 @@
 {
   "name": "@wf-cli-dev/command",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "command",
   "author": "nextc <1391040917@qq.com>",
   "homepage": "https://github.com/warmeaf/wf-cli-dev#readme",
@@ -27,7 +27,7 @@
     "url": "https://github.com/warmeaf/wf-cli-dev/issues"
   },
   "dependencies": {
-    "semver": "^7.6.2",
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "semver": "^7.6.2"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@wf-cli-dev/request",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "request",
   "author": "nextc <1391040917@qq.com>",
   "homepage": "https://github.com/warmeaf/wf-cli-dev#readme",
@@ -27,7 +27,7 @@
     "url": "https://github.com/warmeaf/wf-cli-dev/issues"
   },
   "dependencies": {
-    "got": "^10.7.0",
-    "@wf-cli-dev/log": "file:../../utils/log"
+    "@wf-cli-dev/log": "file:../../utils/log",
+    "got": "^10.7.0"
   }
 }

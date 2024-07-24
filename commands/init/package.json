@@ -1,6 +1,6 @@
 {
   "name": "@wf-cli-dev/init",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "init command",
   "keywords": [
     "init"
@@ -32,13 +32,13 @@
   "dependencies": {
     "@wf-cli-dev/command": "file:../../models/command",
     "@wf-cli-dev/log": "file:../../utils/log",
-    "@wf-cli-dev/request": "file:../../utils/request",
     "@wf-cli-dev/package": "file:../../models/package",
+    "@wf-cli-dev/request": "file:../../utils/request",
     "@wf-cli-dev/utils": "file:../../utils/utils",
+    "ejs": "^3.1.10",
     "fs-extra": "^11.2.0",
-    "inquirer": "^7.3.3",
-    "semver": "^7.6.2",
     "glob": "^10.4.5",
-    "ejs": "^3.1.10"
+    "inquirer": "^7.3.3",
+    "semver": "^7.6.2"
   }
 }

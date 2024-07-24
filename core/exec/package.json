@@ -1,6 +1,6 @@
 {
   "name": "@wf-cli-dev/exec",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "动态执行命令",
   "author": "nextc <1391040917@qq.com>",
   "homepage": "https://github.com/warmeaf/wf-cli-dev#readme",
@@ -27,8 +27,8 @@
     "url": "https://github.com/warmeaf/wf-cli-dev/issues"
   },
   "dependencies": {
-    "@wf-cli-dev/package": "file:../../models/package",
     "@wf-cli-dev/log": "file:../../utils/log",
+    "@wf-cli-dev/package": "file:../../models/package",
     "@wf-cli-dev/utils": "file:../../utils/utils"
   }
 }
