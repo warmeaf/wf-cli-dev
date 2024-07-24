@@ -34,7 +34,6 @@
     "colors": "^1.4.0",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
-    "import-local": "^3.1.0",
     "minimist": "^1.2.8",
     "root-check": "^1.0.0",
     "semver": "^7.6.2"
