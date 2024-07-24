@@ -18,6 +18,7 @@ const log = require('@wf-cli-dev/log')
 const Package = require('@wf-cli-dev/package')
 const { execAsync } = require('@wf-cli-dev/utils')
 const { getProjectTemplate } = require('./api/index')
+const { exec: spawn, formatPath } = require('@wf-cli-dev/utils')
 
 const {
   TYPE_PROJECT,
@@ -56,6 +57,8 @@ class InitCommand extends Command {
       }
     } catch (e) {
       log.error(e.message)
+    } finally {
+      process.exit(0)
     }
   }
 
@@ -80,7 +83,6 @@ class InitCommand extends Command {
     const targetPath = path.resolve(process.cwd())
     log.info('开始安装模板...')
     fse.ensureDir(targetPath)
-    fse.ensureDir(targetPath)
     fse.copySync(templatePath, targetPath)
     log.success('安装模板成功')
     // 渲染项目信息到文件中
@@ -98,7 +100,32 @@ class InitCommand extends Command {
   }
 
   async _installCustomTemplate(projectInfo) {
-    console.log('开始安装自定义模板')
+    const templatePath = formatPath(
+      path.resolve(this.templatePkg.catchFilePath, 'template')
+    )
+    const targetPath = formatPath(path.resolve(process.cwd()))
+    const argsString = JSON.stringify(projectInfo)
+    const rootFile = this.templatePkg.getRootFilePath()
+    log.verbose('自定义安装入口文件路径', rootFile)
+    log.verbose('自定义安装模板路径', templatePath)
+    log.verbose('自定义安装目标路径', targetPath)
+
+    if(!rootFile) {
+      throw new Error('自定义安装入口文件路径不存在')
+    }
+
+    return new Promise((resolve, reject) => {
+      const code = `require('${rootFile}')('${templatePath}', '${targetPath}', ${argsString})`
+      const child = spawn('node', ['-e', code], {
+        stdio: 'inherit',
+      })
+      child.on('exit', () => {
+        resolve()
+      })
+      child.on('error', (e) => {
+        reject(e)
+      })
+    })
   }
 
   /**

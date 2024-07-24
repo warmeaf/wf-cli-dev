@@ -67,7 +67,6 @@ async function exec(...args) {
         stdio: 'inherit',
       })
       child.on('exit', (e) => {
-        log.verbose('命令执行成功：' + e)
         process.exit(e)
       })
       child.on('error', (e) => {
