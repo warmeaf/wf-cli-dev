@@ -14,8 +14,7 @@ const Package = require('@wf-cli-dev/package')
 const { exec: spawn } = require('@wf-cli-dev/utils')
 
 const SETTINGS = {
-  // init: '@wf-cli-dev/init',
-  init: '@imooc-cli/init', // 用于调试
+  init: '@wf-cli-dev/init'
 }
 const CATCH_DIR = 'dependencies'
 
@@ -28,7 +27,6 @@ async function exec(...args) {
   const command = args.at(-1)
   const packageName = SETTINGS[command.name()]
   const packageVersion = 'latest'
-  // const packageVersion = '1.1.0' // 用于测试
 
   let storeDir = '',
     pkg = null
