@@ -50,6 +50,13 @@ function exec(command, args, options) {
   return cp.spawn(cmd, cmdArgs, options)
 }
 
+/**
+ * 异步执行给定的命令，并在执行完成时解析或拒绝 Promise
+ * @param {string} command - 要执行的命令
+ * @param {string[]} args - 命令参数列表
+ * @param {Object} options - 执行命令的选项对象
+ * @return {Promise} - 一个 Promise 对象，当命令成功完成时 resolve，失败时 reject
+ */
 function execAsync(command, args, options) {
   return new Promise((resolve, reject) => {
     const child = exec(command, args, options)
